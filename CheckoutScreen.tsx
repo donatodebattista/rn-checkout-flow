@@ -97,11 +97,7 @@ export default function CheckoutScreen() {
       setIsEditingPayment(false);
     }
 
-    Alert.alert(
-      'Payment Processed',
-      'Your order has been successfully placed!',
-      [{ text: 'Great!' }]
-    );
+    router.push('/confirmation' as any);
   };
 
   const handleAddressPress = () => {
