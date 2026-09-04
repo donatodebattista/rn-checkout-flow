@@ -14,14 +14,23 @@ export interface CartItemType {
   quantity: number;
 }
 
-export interface ShippingAddress {
+export type BillingType = 'Personal' | 'Commercial';
+
+export interface AddressInfo {
   fullName: string;
+  phonePrefix: string;
   phone: string;
   email: string;
-  address: string;
+  addressTitle?: string;
+  streetAddress: string;
+  streetAddress2?: string;
   city: string;
-  sameAsBilling: boolean;
+  county: string;
+  sameAsDelivery: boolean;
+  billingType: BillingType;
 }
+
+export type ShippingAddress = AddressInfo;
 
 export interface PaymentMethod {
   cardHolder: string;
