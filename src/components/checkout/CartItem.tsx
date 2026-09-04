@@ -10,8 +10,9 @@ import {
   Pressable,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { theme } from './theme';
-import { CartItemType, useCartStore } from './store';
+import { theme } from '../../theme';
+import { useCartStore } from '../../store';
+import { CartItemType } from '../../types';
 
 interface CartItemProps {
   item: CartItemType;

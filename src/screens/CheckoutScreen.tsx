@@ -15,11 +15,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { theme } from './theme';
-import { useCartStore } from './store';
-import { AddressSummary } from './AddressSummary';
-import { PaymentMethodSummary } from './PaymentMethodSummary';
-import { OrderReviewBackdrop } from './OrderReviewBackdrop';
+import { theme } from '../theme';
+import { useCartStore } from '../store';
+import {
+  AddressSummary,
+  PaymentMethodSummary,
+  OrderReviewBackdrop,
+} from '../components/checkout';
 
 export default function CheckoutScreen() {
   const insets = useSafeAreaInsets();
@@ -225,7 +227,7 @@ export default function CheckoutScreen() {
           {/* Input: Card Holder's Name */}
           <View style={styles.inputContainer}>
             {cardHolder.length > 0 && (
-              <Text style={styles.floatingLabel}>Card Holder's Name</Text>
+              <Text style={styles.floatingLabel}>Card Holder&apos;s Name</Text>
             )}
             <TextInput
               style={styles.textInput}

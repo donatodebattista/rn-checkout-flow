@@ -1,1 +1,1 @@
-export { default } from '../SavedAddressesScreen';
+export { SavedAddressesScreen as default } from '@/src/screens';

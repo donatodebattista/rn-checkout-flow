@@ -1,1 +1,1 @@
-export { default } from '../ConfirmationScreen';
+export { ConfirmationScreen as default } from '@/src/screens';

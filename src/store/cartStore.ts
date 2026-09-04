@@ -1,60 +1,10 @@
 import { create } from 'zustand';
-
-export interface CartItemType {
-  id: string;
-  name: string;
-  subtitle: string;
-  price: number;
-  originalPrice?: number;
-  image: any;
-  selectedColor: string;
-  availableColors: string[];
-  selectedSize: string;
-  availableSizes: string[];
-  quantity: number;
-}
-
-export type BillingType = 'Personal' | 'Commercial';
-
-export interface AddressInfo {
-  fullName: string;
-  phonePrefix: string;
-  phone: string;
-  email: string;
-  addressTitle?: string;
-  streetAddress: string;
-  streetAddress2?: string;
-  city: string;
-  county: string;
-  sameAsDelivery: boolean;
-  billingType: BillingType;
-}
-
-export type ShippingAddress = AddressInfo;
-
-export interface SavedAddress {
-  id: string;
-  title: string;
-  fullName: string;
-  phonePrefix: string;
-  phone: string;
-  email: string;
-  streetAddress: string;
-  streetAddress2?: string;
-  city: string;
-  county: string;
-  sameAsDelivery: boolean;
-  billingType: BillingType;
-}
-
-export interface PaymentMethod {
-  cardHolder: string;
-  cardNumber: string;
-  expiry: string;
-  cvv: string;
-  cardType: 'credit' | 'debit';
-  cardLabel?: string;
-}
+import {
+  CartItemType,
+  ShippingAddress,
+  SavedAddress,
+  PaymentMethod,
+} from '../types';
 
 interface CartStore {
   items: CartItemType[];
@@ -63,17 +13,17 @@ interface CartStore {
   selectedAddressId: string | null;
   paymentMethod: PaymentMethod | null;
   paymentInfo: PaymentMethod | null;
-  
+
   // Actions
   updateItemVariant: (id: string, variant: { color?: string; size?: string }) => void;
   updateItemQuantity: (id: string, quantity: number) => void;
   removeItem: (id: string) => void;
-  
+
   // Helpers
   getSubtotal: () => number;
   getItemCount: () => number;
-  
-  // Future checkout steps
+
+  // Checkout steps
   setShippingAddress: (address: ShippingAddress) => void;
   setSelectedAddress: (id: string) => void;
   setPaymentMethod: (payment: PaymentMethod) => void;
@@ -87,7 +37,7 @@ const initialCartItems: CartItemType[] = [
     name: 'NikeCourt Lite 2',
     subtitle: 'Women’s Hard Court Tennis Shoe',
     price: 67.0,
-    image: require('./assets/images/nike-shoe.png'),
+    image: require('../../assets/images/nike-shoe.png'),
     selectedColor: 'Blue',
     availableColors: ['Blue', 'White', 'Black', 'Pink'],
     selectedSize: '38 EU',
@@ -100,7 +50,7 @@ const initialCartItems: CartItemType[] = [
     subtitle: 'Adult Tennis Racket',
     price: 80.45,
     originalPrice: 99.95,
-    image: require('./assets/images/wilson-racket.png'),
+    image: require('../../assets/images/wilson-racket.png'),
     selectedColor: 'Black',
     availableColors: ['Black', 'White', 'Gold', 'Red'],
     selectedSize: '2 -1/4',
