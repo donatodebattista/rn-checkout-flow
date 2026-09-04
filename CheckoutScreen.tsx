@@ -21,7 +21,7 @@ import { useCartStore } from './store';
 export default function CheckoutScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { items, getSubtotal, getItemCount, setPaymentInfo } = useCartStore();
+  const { items, getSubtotal, getItemCount, setPaymentInfo, shippingAddress } = useCartStore();
 
   // Local states for credit card inputs
   const [cardHolder, setCardHolder] = useState('');
@@ -85,7 +85,7 @@ export default function CheckoutScreen() {
   };
 
   const handleAddAddress = () => {
-    Alert.alert('Shipping Address', 'Address selection will be available in the next step.');
+    router.push('/address' as any);
   };
 
   const isMastercard = rawCardDigits.startsWith('5');
@@ -135,25 +135,65 @@ export default function CheckoutScreen() {
         keyboardShouldPersistTaps="handled"
       >
         {/* Shipping Section */}
-        <View style={styles.sectionHeaderRow}>
+        <View style={styles.shippingHeaderRow}>
           <Text style={styles.sectionTitle}>Shipping</Text>
+          {shippingAddress && (
+            <TouchableOpacity onPress={handleAddAddress} activeOpacity={0.7}>
+              <Text style={styles.addEditButtonText}>Add / Edit</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        <TouchableOpacity
-          style={styles.shippingCard}
-          onPress={handleAddAddress}
-          activeOpacity={0.7}
-        >
-          <View style={styles.shippingLeft}>
-            <MaterialCommunityIcons
-              name="truck-delivery-outline"
-              size={22}
-              color={theme.colors.textDark}
-            />
-            <Text style={styles.shippingButtonText}>Add Address</Text>
+        {!shippingAddress ? (
+          <TouchableOpacity
+            style={styles.shippingCard}
+            onPress={handleAddAddress}
+            activeOpacity={0.7}
+          >
+            <View style={styles.shippingLeft}>
+              <MaterialCommunityIcons
+                name="truck-delivery-outline"
+                size={22}
+                color={theme.colors.textDark}
+              />
+              <Text style={styles.shippingButtonText}>Add Address</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.savedAddressContainer}>
+            <TouchableOpacity
+              style={styles.savedAddressCard}
+              onPress={handleAddAddress}
+              activeOpacity={0.7}
+            >
+              <View style={styles.savedAddressDetails}>
+                <Text style={styles.savedAddressName}>{shippingAddress.fullName}</Text>
+                <Text style={styles.savedAddressText}>{shippingAddress.email}</Text>
+                <Text style={styles.savedAddressText}>
+                  {shippingAddress.phonePrefix} {shippingAddress.phone}
+                </Text>
+                <Text style={[styles.savedAddressText, { marginTop: 6 }]}>
+                  {shippingAddress.streetAddress}
+                </Text>
+                <Text style={styles.savedAddressText}>
+                  {shippingAddress.city}, {shippingAddress.county}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />
+            </TouchableOpacity>
+
+            {/* Checkbox: Billing and delivery addresses are same */}
+            <View style={styles.sameAddressCheckboxRow}>
+              <View style={styles.sameAddressCheckbox}>
+                <Ionicons name="checkmark" size={14} color="#ffffff" />
+              </View>
+              <Text style={styles.sameAddressCheckboxLabel}>
+                Billing and delivery addresses are same.
+              </Text>
+            </View>
           </View>
-          <Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />
-        </TouchableOpacity>
+        )}
 
         {/* Gray Section Divider */}
         <View style={styles.sectionDivider} />
@@ -443,6 +483,64 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: theme.typography.weights.bold,
     color: theme.colors.textDark,
+  },
+  shippingHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 12,
+  },
+  addEditButtonText: {
+    fontSize: 14,
+    fontWeight: theme.typography.weights.semibold,
+    color: theme.colors.primary,
+  },
+  savedAddressContainer: {
+    marginHorizontal: 16,
+  },
+  savedAddressCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: theme.colors.cardBg,
+    borderRadius: theme.borderRadius.lg,
+    padding: 16,
+  },
+  savedAddressDetails: {
+    flex: 1,
+    paddingRight: 10,
+  },
+  savedAddressName: {
+    fontSize: 15,
+    fontWeight: theme.typography.weights.bold,
+    color: theme.colors.textDark,
+    marginBottom: 6,
+  },
+  savedAddressText: {
+    fontSize: 13,
+    color: theme.colors.textDark,
+    lineHeight: 18,
+  },
+  sameAddressCheckboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 14,
+  },
+  sameAddressCheckbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    backgroundColor: theme.colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  sameAddressCheckboxLabel: {
+    fontSize: 13.5,
+    color: theme.colors.textDark,
+    fontWeight: theme.typography.weights.regular,
   },
   shippingCard: {
     flexDirection: 'row',
