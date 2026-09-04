@@ -6,6 +6,7 @@ export default function RootLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="checkout" />
       <Stack.Screen name="address" />
+      <Stack.Screen name="addresses" />
     </Stack>
   );
 }
