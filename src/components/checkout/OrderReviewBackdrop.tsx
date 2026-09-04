@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { theme } from './theme';
-import { useCartStore } from './store';
+import { theme } from '../../theme';
+import { useCartStore } from '../../store';
 
 interface OrderReviewBackdropProps {
   visible: boolean;

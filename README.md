@@ -1,6 +1,6 @@
 # 🛒 Checkout Flow - Mobile E-Commerce (React Native & Expo)
 
-Aplicación móvil de flujo de compra (*Shopping Cart ➔ Secure Payment ➔ Addresses ➔ Confirmation*) desarrollada en **React Native** con **Expo (SDK 54)**, **Expo Router** y **TypeScript**, diseñada con fidelidad de píxel respecto a especificaciones de diseño en Figma y gestión de estado reactiva con **Zustand**.
+Aplicación móvil de flujo de compra (*Shopping Cart ➔ Secure Payment ➔ Addresses ➔ Confirmation*) desarrollada en **React Native** con **Expo (SDK 57)**, **Expo Router** y **TypeScript**, diseñada con fidelidad de píxel respecto a especificaciones de diseño en Figma y gestión de estado reactiva con **Zustand**.
 
 ---
 
@@ -51,7 +51,7 @@ Aplicación móvil de flujo de compra (*Shopping Cart ➔ Secure Payment ➔ Add
 
 ## 🛠️ Tecnologías y Librerías
 
-- **Framework**: [React Native 0.81](https://reactnative.dev/) & [Expo SDK ~54](https://docs.expo.dev/)
+- **Framework**: [React Native 0.86](https://reactnative.dev/) & [Expo SDK ~57](https://docs.expo.dev/)
 - **Enrutamiento**: [Expo Router v6](https://docs.expo.dev/router/introduction/) (enfoque basado en archivos)
 - **Lenguaje**: [TypeScript 5.9](https://www.typescriptlang.org/) (Strict Mode)
 - **Estado Global**: [Zustand 5](https://zustand-demo.pmnd.rs/)
@@ -61,34 +61,49 @@ Aplicación móvil de flujo de compra (*Shopping Cart ➔ Secure Payment ➔ Add
 
 ---
 
-## 📐 Arquitectura de Archivos (Estructura Plana)
+## 📐 Arquitectura del Proyecto (Modular por Capas)
 
-Siguiendo las directrices del proyecto, todos los componentes UI y de estado se mantienen en una estructura plana en la raíz para evitar anidamientos innecesarios, respetando las carpetas estrictamente requeridas por Expo Router:
+El proyecto implementa una **arquitectura limpia modular por capas** bajo el directorio `src/`, desacoplando la lógica de negocio, las pantallas, los componentes visuales reutilizables, los tokens de diseño y las definiciones de tipos. La carpeta `app/` de **Expo Router** actúa como una capa de enrutamiento delgada y declarativa:
 
 ```text
-├── app/                              # Rutas de Expo Router (wrappers delgados)
-│   ├── _layout.tsx                   # Stack Navigator principal
-│   ├── index.tsx                     # Pantalla 1: Shopping Cart
-│   ├── checkout.tsx                  # Pantalla 2: Secure Payment
-│   ├── address.tsx                   # Pantalla 3: Add Address
-│   ├── addresses.tsx                 # Pantalla 4: Saved Addresses
-│   └── confirmation.tsx              # Pantalla 5: Order Confirmation
+├── app/                                    # Capa de Enrutamiento (Expo Router)
+│   ├── _layout.tsx                         # Stack Navigator principal
+│   ├── index.tsx                           # Ruta '/' ➔ Re-exporta ShoppingCartScreen
+│   ├── checkout.tsx                        # Ruta '/checkout' ➔ Re-exporta CheckoutScreen
+│   ├── address.tsx                         # Ruta '/address' ➔ Re-exporta AddAddressScreen
+│   ├── addresses.tsx                       # Ruta '/addresses' ➔ Re-exporta SavedAddressesScreen
+│   └── confirmation.tsx                    # Ruta '/confirmation' ➔ Re-exporta ConfirmationScreen
 │
-├── CartItem.tsx                      # Componente de tarjeta de producto en carrito
-├── CheckoutScreen.tsx                # Pantalla principal de Secure Payment
-├── AddAddressScreen.tsx              # Pantalla de formulario de nueva dirección
-├── SavedAddressesScreen.tsx          # Pantalla de selección de direcciones guardadas
-├── OrderReviewBackdrop.tsx           # Panel desplegable (bottom sheet) con backdrop
-├── ConfirmationScreen.tsx            # Pantalla final de éxito de compra
-├── AddressSummary.tsx                # Componente modular: Resumen de dirección guardada
-├── PaymentMethodSummary.tsx          # Componente modular: Resumen de tarjeta colapsada
+├── src/                                    # Capa Modular de Código Fuente
+│   ├── types/                              # Definiciones e Interfaces TypeScript
+│   │   └── index.ts                        # CartItemType, AddressInfo, SavedAddress, PaymentMethod...
+│   │
+│   ├── theme/                              # Design Tokens centralizados
+│   │   └── index.ts                        # Colores, tipografía, bordes y espaciados (theme)
+│   │
+│   ├── store/                              # Estado Global con Zustand
+│   │   ├── cartStore.ts                    # Hook useCartStore con lógica y acciones del carrito
+│   │   └── index.ts                        # Exportación centralizada del store
+│   │
+│   ├── components/                         # Componentes de Dominio Reutilizables
+│   │   └── checkout/                       # Componentes específicos del flujo de checkout
+│   │       ├── CartItem.tsx                # Tarjeta de producto con modales de color/talle y control de cantidad
+│   │       ├── AddressSummary.tsx          # Tarjeta resumen de dirección seleccionada
+│   │       ├── PaymentMethodSummary.tsx    # Tarjeta colapsada de método de pago (Mastercard)
+│   │       ├── OrderReviewBackdrop.tsx     # Panel inferior desplegable (Bottom Sheet) con backdrop
+│   │       └── index.ts                    # Barrel export de componentes
+│   │
+│   └── screens/                            # Vistas y Pantallas Completas Desacopladas
+│       ├── ShoppingCartScreen.tsx          # Pantalla 1: Carrito de compras y subtotal
+│       ├── CheckoutScreen.tsx              # Pantalla 2: Formulario de pago, dirección y carrusel
+│       ├── AddAddressScreen.tsx            # Pantalla 3: Formulario estructurado de nueva dirección
+│       ├── SavedAddressesScreen.tsx        # Pantalla 4: Selección entre direcciones guardadas
+│       ├── ConfirmationScreen.tsx          # Pantalla 5: Resumen final de orden y agradecimiento
+│       └── index.ts                        # Barrel export de pantallas
 │
-├── store.ts                          # Estado global centralizado con Zustand
-├── theme.ts                          # Design Tokens (colores, tipografías, espaciados)
-│
-├── assets/                           # Recursos multimedia
-│   ├── design/                       # Mockups de referencia de Figma
-│   └── images/                       # Imágenes de productos e iconos
+├── assets/                                 # Recursos multimedia
+│   ├── design/                             # Mockups de referencia de Figma
+│   └── images/                             # Imágenes de productos e iconos
 │
 ├── package.json
 ├── tsconfig.json

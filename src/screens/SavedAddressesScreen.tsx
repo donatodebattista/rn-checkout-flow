@@ -10,8 +10,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { theme } from './theme';
-import { useCartStore } from './store';
+import { theme } from '../theme';
+import { useCartStore } from '../store';
 
 export default function SavedAddressesScreen() {
   const insets = useSafeAreaInsets();

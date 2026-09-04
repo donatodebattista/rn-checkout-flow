@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { theme } from './theme';
-import { PaymentMethod } from './store';
+import { theme } from '../../theme';
+import { PaymentMethod } from '../../types';
 
 interface PaymentMethodSummaryProps {
   payment: PaymentMethod;

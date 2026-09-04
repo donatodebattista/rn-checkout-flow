@@ -16,8 +16,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { theme } from './theme';
-import { useCartStore, BillingType } from './store';
+import { theme } from '../theme';
+import { useCartStore } from '../store';
+import { BillingType } from '../types';
 
 const AVAILABLE_CITIES = [
   'Clausthal-Zellerfeld',
