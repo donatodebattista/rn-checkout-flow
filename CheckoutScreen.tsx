@@ -19,6 +19,7 @@ import { theme } from './theme';
 import { useCartStore } from './store';
 import { AddressSummary } from './AddressSummary';
 import { PaymentMethodSummary } from './PaymentMethodSummary';
+import { OrderReviewBackdrop } from './OrderReviewBackdrop';
 
 export default function CheckoutScreen() {
   const insets = useSafeAreaInsets();
@@ -33,6 +34,7 @@ export default function CheckoutScreen() {
   } = useCartStore();
 
   const [isEditingPayment, setIsEditingPayment] = useState(false);
+  const [isOrderReviewVisible, setIsOrderReviewVisible] = useState(false);
 
   // Local states for credit card inputs
   const [cardHolder, setCardHolder] = useState('');
@@ -386,16 +388,20 @@ export default function CheckoutScreen() {
         ]}
       >
         <View style={styles.footerMainRow}>
-          {/* Total Preview */}
-          <View style={styles.totalSection}>
-            <TouchableOpacity style={styles.chevronButton} activeOpacity={0.6}>
+          {/* Total Preview (Tapping opens Order Review sheet) */}
+          <TouchableOpacity
+            style={styles.totalSection}
+            onPress={() => setIsOrderReviewVisible(true)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.chevronButton}>
               <Ionicons name="chevron-up" size={20} color={theme.colors.primary} />
-            </TouchableOpacity>
+            </View>
             <View style={styles.totalTextContainer}>
               <Text style={styles.totalLabel}>Total</Text>
               <Text style={styles.totalAmount}>${formattedTotal}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
 
           {/* Pay Now Button */}
           <TouchableOpacity
@@ -422,6 +428,14 @@ export default function CheckoutScreen() {
           be transaction
         </Text>
       </View>
+
+      {/* Order Review Bottom Sheet Backdrop */}
+      <OrderReviewBackdrop
+        visible={isOrderReviewVisible}
+        onClose={() => setIsOrderReviewVisible(false)}
+        onPayNow={handlePayNow}
+        isPayEnabled={isPayEnabled}
+      />
     </KeyboardAvoidingView>
   );
 }
