@@ -17,11 +17,22 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { theme } from './theme';
 import { useCartStore } from './store';
+import { AddressSummary } from './AddressSummary';
+import { PaymentMethodSummary } from './PaymentMethodSummary';
 
 export default function CheckoutScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { items, getSubtotal, getItemCount, setPaymentInfo, shippingAddress } = useCartStore();
+  const {
+    items,
+    getSubtotal,
+    getItemCount,
+    setPaymentInfo,
+    shippingAddress,
+    paymentInfo,
+  } = useCartStore();
+
+  const [isEditingPayment, setIsEditingPayment] = useState(false);
 
   // Local states for credit card inputs
   const [cardHolder, setCardHolder] = useState('');
@@ -56,7 +67,7 @@ export default function CheckoutScreen() {
     setCvv(cleaned);
   };
 
-  // Validation: Pay Now button is enabled only when all required fields are filled
+  // Validation: Pay Now button is enabled if paymentInfo is already saved OR if the form fields are filled
   const rawCardDigits = cardNumber.replace(/\s+/g, '');
   const isFormValid =
     cardHolder.trim().length > 0 &&
@@ -65,22 +76,29 @@ export default function CheckoutScreen() {
     year.trim().length > 0 &&
     cvv.trim().length >= 3;
 
-  const handlePayNow = () => {
-    if (!isFormValid) return;
+  const hasSavedPayment = paymentInfo !== null && !isEditingPayment;
+  const isPayEnabled = hasSavedPayment || isFormValid;
 
-    // Save payment information in Zustand store
-    setPaymentInfo({
-      cardHolder: cardHolder.trim(),
-      cardNumber: rawCardDigits,
-      expiry: `${month}/${year}`,
-      cvv: cvv.trim(),
-      cardType: 'credit',
-    });
+  const handlePayNow = () => {
+    if (!isPayEnabled) return;
+
+    if (!hasSavedPayment) {
+      // Save payment information in Zustand store
+      setPaymentInfo({
+        cardHolder: cardHolder.trim(),
+        cardNumber: rawCardDigits,
+        expiry: `${month}/${year}`,
+        cvv: cvv.trim(),
+        cardType: 'credit',
+        cardLabel: 'My Virtual Debit Card',
+      });
+      setIsEditingPayment(false);
+    }
 
     Alert.alert(
-      'Payment Information Saved',
-      'Your card details have been securely recorded in the checkout store.',
-      [{ text: 'OK' }]
+      'Payment Processed',
+      'Your order has been successfully placed!',
+      [{ text: 'Great!' }]
     );
   };
 
@@ -161,49 +179,37 @@ export default function CheckoutScreen() {
             <Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />
           </TouchableOpacity>
         ) : (
-          <View style={styles.savedAddressContainer}>
-            <TouchableOpacity
-              style={styles.savedAddressCard}
-              onPress={handleAddAddress}
-              activeOpacity={0.7}
-            >
-              <View style={styles.savedAddressDetails}>
-                <Text style={styles.savedAddressName}>{shippingAddress.fullName}</Text>
-                <Text style={styles.savedAddressText}>{shippingAddress.email}</Text>
-                <Text style={styles.savedAddressText}>
-                  {shippingAddress.phonePrefix} {shippingAddress.phone}
-                </Text>
-                <Text style={[styles.savedAddressText, { marginTop: 6 }]}>
-                  {shippingAddress.streetAddress}
-                </Text>
-                <Text style={styles.savedAddressText}>
-                  {shippingAddress.city}, {shippingAddress.county}
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />
-            </TouchableOpacity>
-
-            {/* Checkbox: Billing and delivery addresses are same */}
-            <View style={styles.sameAddressCheckboxRow}>
-              <View style={styles.sameAddressCheckbox}>
-                <Ionicons name="checkmark" size={14} color="#ffffff" />
-              </View>
-              <Text style={styles.sameAddressCheckboxLabel}>
-                Billing and delivery addresses are same.
-              </Text>
-            </View>
-          </View>
+          <AddressSummary
+            address={shippingAddress}
+            onPress={handleAddAddress}
+          />
         )}
 
         {/* Gray Section Divider */}
         <View style={styles.sectionDivider} />
 
         {/* Payment Section */}
-        <View style={styles.sectionHeaderRow}>
+        <View style={styles.paymentHeaderRow}>
           <Text style={styles.sectionTitle}>Payment</Text>
+          {paymentInfo && (
+            <TouchableOpacity
+              onPress={() => setIsEditingPayment(!isEditingPayment)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.addEditButtonText}>
+                {isEditingPayment ? 'Done' : 'Add / Edit'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        <View style={styles.paymentCard}>
+        {paymentInfo && !isEditingPayment ? (
+          <PaymentMethodSummary
+            payment={paymentInfo}
+            onPress={() => setIsEditingPayment(true)}
+          />
+        ) : (
+          <View style={styles.paymentCard}>
           {/* Card Type Header */}
           <View style={styles.paymentCardHeader}>
             <MaterialCommunityIcons
@@ -322,6 +328,7 @@ export default function CheckoutScreen() {
             </TouchableOpacity>
           </View>
         </View>
+      )}
 
         {/* Gray Section Divider */}
         <View style={styles.sectionDivider} />
@@ -395,14 +402,14 @@ export default function CheckoutScreen() {
             style={[
               styles.payNowButton,
               {
-                backgroundColor: isFormValid
+                backgroundColor: isPayEnabled
                   ? theme.colors.primary
                   : theme.colors.buttonDisabled,
               },
             ]}
-            activeOpacity={isFormValid ? 0.85 : 1}
+            activeOpacity={isPayEnabled ? 0.85 : 1}
             onPress={handlePayNow}
-            disabled={!isFormValid}
+            disabled={!isPayEnabled}
           >
             <Text style={styles.payNowButtonText}>Pay Now</Text>
           </TouchableOpacity>
@@ -485,6 +492,14 @@ const styles = StyleSheet.create({
     color: theme.colors.textDark,
   },
   shippingHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 12,
+  },
+  paymentHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
