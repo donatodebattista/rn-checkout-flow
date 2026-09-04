@@ -38,6 +38,7 @@ export interface PaymentMethod {
   expiry: string;
   cvv: string;
   cardType: 'credit' | 'debit';
+  cardLabel?: string;
 }
 
 interface CartStore {
