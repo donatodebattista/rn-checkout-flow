@@ -32,6 +32,21 @@ export interface AddressInfo {
 
 export type ShippingAddress = AddressInfo;
 
+export interface SavedAddress {
+  id: string;
+  title: string;
+  fullName: string;
+  phonePrefix: string;
+  phone: string;
+  email: string;
+  streetAddress: string;
+  streetAddress2?: string;
+  city: string;
+  county: string;
+  sameAsDelivery: boolean;
+  billingType: BillingType;
+}
+
 export interface PaymentMethod {
   cardHolder: string;
   cardNumber: string;
@@ -44,6 +59,8 @@ export interface PaymentMethod {
 interface CartStore {
   items: CartItemType[];
   shippingAddress: ShippingAddress | null;
+  savedAddresses: SavedAddress[];
+  selectedAddressId: string | null;
   paymentMethod: PaymentMethod | null;
   paymentInfo: PaymentMethod | null;
   
@@ -58,6 +75,7 @@ interface CartStore {
   
   // Future checkout steps
   setShippingAddress: (address: ShippingAddress) => void;
+  setSelectedAddress: (id: string) => void;
   setPaymentMethod: (payment: PaymentMethod) => void;
   setPaymentInfo: (payment: PaymentMethod) => void;
   resetCart: () => void;
@@ -91,9 +109,40 @@ const initialCartItems: CartItemType[] = [
   },
 ];
 
+const initialSavedAddresses: SavedAddress[] = [
+  {
+    id: '1',
+    title: 'My Office',
+    fullName: 'Banu Elson',
+    phonePrefix: '+49',
+    phone: '179 111 1010',
+    email: 'orders@banuelson.com',
+    streetAddress: 'Altenauer Str., 35',
+    city: 'Clausthal-Zellerfeld',
+    county: 'Germany',
+    sameAsDelivery: true,
+    billingType: 'Personal',
+  },
+  {
+    id: '2',
+    title: "Mum's House",
+    fullName: 'Alice Elson',
+    phonePrefix: '+49',
+    phone: '179 222 2020',
+    email: 'alice@elson.com',
+    streetAddress: 'Erzstrasse Str., 9',
+    city: 'Clausthal-Zellerfeld',
+    county: 'Germany',
+    sameAsDelivery: true,
+    billingType: 'Personal',
+  },
+];
+
 export const useCartStore = create<CartStore>((set, get) => ({
   items: initialCartItems,
-  shippingAddress: null,
+  savedAddresses: initialSavedAddresses,
+  selectedAddressId: '1',
+  shippingAddress: initialSavedAddresses[0],
   paymentMethod: null,
   paymentInfo: null,
 
@@ -138,7 +187,20 @@ export const useCartStore = create<CartStore>((set, get) => ({
   },
 
   setShippingAddress: (shippingAddress) => set({ shippingAddress }),
+  setSelectedAddress: (id: string) => {
+    const address = get().savedAddresses.find((a) => a.id === id);
+    if (address) {
+      set({ selectedAddressId: id, shippingAddress: address });
+    }
+  },
   setPaymentMethod: (paymentMethod) => set({ paymentMethod, paymentInfo: paymentMethod }),
   setPaymentInfo: (paymentInfo) => set({ paymentMethod: paymentInfo, paymentInfo }),
-  resetCart: () => set({ items: initialCartItems, shippingAddress: null, paymentMethod: null, paymentInfo: null }),
+  resetCart: () =>
+    set({
+      items: initialCartItems,
+      shippingAddress: initialSavedAddresses[0],
+      selectedAddressId: '1',
+      paymentMethod: null,
+      paymentInfo: null,
+    }),
 }));

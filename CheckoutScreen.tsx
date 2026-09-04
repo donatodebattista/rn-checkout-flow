@@ -104,8 +104,12 @@ export default function CheckoutScreen() {
     );
   };
 
-  const handleAddAddress = () => {
-    router.push('/address' as any);
+  const handleAddressPress = () => {
+    if (shippingAddress) {
+      router.push('/addresses' as any);
+    } else {
+      router.push('/address' as any);
+    }
   };
 
   const isMastercard = rawCardDigits.startsWith('5');
@@ -158,7 +162,7 @@ export default function CheckoutScreen() {
         <View style={styles.shippingHeaderRow}>
           <Text style={styles.sectionTitle}>Shipping</Text>
           {shippingAddress && (
-            <TouchableOpacity onPress={handleAddAddress} activeOpacity={0.7}>
+            <TouchableOpacity onPress={handleAddressPress} activeOpacity={0.7}>
               <Text style={styles.addEditButtonText}>Add / Edit</Text>
             </TouchableOpacity>
           )}
@@ -167,7 +171,7 @@ export default function CheckoutScreen() {
         {!shippingAddress ? (
           <TouchableOpacity
             style={styles.shippingCard}
-            onPress={handleAddAddress}
+            onPress={handleAddressPress}
             activeOpacity={0.7}
           >
             <View style={styles.shippingLeft}>
@@ -183,7 +187,7 @@ export default function CheckoutScreen() {
         ) : (
           <AddressSummary
             address={shippingAddress}
-            onPress={handleAddAddress}
+            onPress={handleAddressPress}
           />
         )}
 
